@@ -1,0 +1,144 @@
+---
+title: "Regression HW2"
+author: "Pooria Assarehha"
+date: "2023-11-16"
+output: pdf_document
+---
+
+## Ex 2.3
+
+$\sigma^2$ is not known.
+
+$$
+\begin{cases}H_0 : \beta_0 = 0 \\
+H_1 : \beta_1 \neq 0\end{cases} \quad \Rightarrow \quad T = \frac{\hat{\beta_1}}{\sqrt{\frac{MSE}{S_{xx}}}}  \quad \Rightarrow \quad \begin{cases}\hat{\beta_1} = \frac{S_{xy}}{S_{xx}} = 1.4\\
+SSE = S_{yy} - \frac{S^2_{xy}}{S_{xx}} = 100\\
+      MSE = \frac{SSE}{n-2} = \frac{100}{36}\end{cases} \quad \Rightarrow \quad t= 8.4 \quad , \quad P(T < - 8.4) +P (T > 8.4) 
+$$
+
+```{r}
+n=38
+Sxx = 100
+Sxy = 140
+Syy = 296
+B1h = Sxy/Sxx
+SSE = Syy - Sxy^2/Sxx
+MSE = SSE /(n-2)
+tdata = B1h/sqrt(MSE/Sxx)
+2*pt(abs(tdata), df = 36, lower.tail = FALSE)
+```
+
+Reject $H_0$.
+
+## Ex 2.7
+
+$$
+E[y|x_0] = \beta_1 x_0 \quad \Rightarrow \quad \hat{y}_{x_0} = \hat{\beta_1}x_0 \quad , \quad Var(\hat{y}_{x_0}) = x_0^2Var(\hat{\beta_1}) = x_0^2 \frac{\sum_i^n x_i^2 Var(y_i)}{\left(\sum_i^n x_i^2\right)^2} = \frac{\sigma^2 x_0^2}{\sum_i^n x_i^2}
+$$
+
+Pivotal Quantity for $E(y|x_o)$ and then $100(1 - \alpha)\%$ ConfInt is Point Est $\pm t_{(n-1, \frac{\alpha}{2})}\sqrt{Var(Point Est.)}$ 
+
+$$
+ \hat{y}_{x_0} \sim N(\beta_1x_0 , \sigma^2 \frac{ x_0^2}{\sum_i^n x_i^2}) \quad \Rightarrow \quad Q = \frac{\hat{y}_{x_0} - E[y|x_0]}{S_e\sqrt{\frac{ x_0^2}{\sum_i^n  x_i^2}}} \sim t_{(n-1)} \quad \Rightarrow \quad \hat{\beta_1} x_0 \pm t_{(n-1), \frac{\alpha}{2}} S_e \sqrt{\frac{ x_0^2}{\sum_i^n  x_i^2}}
+$$
+
+## Ex 2.8
+
+```{r}
+x = c(0.414, 0.383, 0.393, 0.402, 0.442, 0.422, 0.466, 0.500, 0.514, 
+      0.530, 0.569, 0.558, 0.577, 0.572, 0.548, 0.581, 0.557, 0.550, 
+      0.531, 0.550, 0.556, 0.523, 0.602, 0.569, 0.544, 0.557, 0.530)
+y = c(29186, 29266, 26215, 30162, 38867, 37831, 44576, 46097, 59698,
+      67705, 66088, 78486, 89869, 77369, 67095, 85156, 69571, 84160,
+      73466, 78610, 67657, 74017, 87291, 86836, 82540, 81699, 82096)
+n = length(x)
+linfit = lm(y~x)
+summary(linfit)
+```
+
+```{r}
+mse <- sum((linfit$residuals)^2)/(n-2)
+Sxx <- sum((x - mean(x))^2)
+varhatbeta1 <- mse/Sxx
+varhatbeta0 <- mse*(1/n + mean(x)^2/Sxx)
+mse
+varhatbeta0
+varhatbeta1
+```
+
+```{r}
+Sxy <- sum((x - mean(x))*(y - mean(y))) 
+beta1hat <- Sxy/Sxx
+t = beta1hat/sqrt(mse/Sxx)
+2*pt(-t, df=n-2) 
+```
+
+```{r}
+anova(linfit)
+```
+
+$2Pr(>F) < 0.05$ Reject $H_0$.
+
+```{r}
+betahat = linfit$coefficients
+yhatnew = betahat[1] + betahat[2]*0.580 
+interval <- yhatnew + c(1, 0, -1)*qt(0.025, df= n-2)*sqrt(mse*(1 + 1/n + (0.580 - mean(x))^2/Sxx))
+names(interval) <- c("Lower bound", "Point est.", "Upper bound")
+interval
+```
+
+```{r}
+predict(linfit, data.frame(x = 0.580), interval = "confidence")
+```
+
+## Ex 2.11
+
+presuming $y_i = \beta_0 + \beta_1 x_i + \epsilon_i$
+
+$$
+\hat{y_i} = \hat{\beta_0} + \hat{\beta_1}x_i = \bar{y} +  \frac{S_{xy}}{S_{xx}}(x_i - \bar{x}) = 61.8 + \frac{446.17}{64.51}(x_i - 15.53)
+= -45.61 + 6.91 x_i
+$$
+
+$$
+MSE = \frac{S_{yy} - \frac{S^2_{xy}}{S_{xx}}}{n-2} = \frac{3744.36 - \frac{446.17^2}{64.51}}{20 - 2} = 36.58
+$$
+
+$$
+T = \frac{\hat{\beta_1}}{\sqrt{\frac{MSE}{S_{xx}}}} = \frac{6.91}{\sqrt{\frac{36.58}{64.51}}} = \frac{6.91}{0.75} = 9.17
+$$
+
+$$
+r = \frac{S_{xy}}{\sqrt{S_{xx}S_{yy}}} = 0.907 \quad , \quad T = \frac{r\sqrt{n-2}}{\sqrt{1-r^2}} = 9.18
+$$
+
+$$
+Var(\hat{\beta_0}) = \sigma^2\left(\frac{1}{n} + \frac{\bar{x}^2}{S_{xx}}\right) \quad \Rightarrow \quad \bar{y} - \frac{S_{xy}}{S_{xx}} \bar{x} \pm t_{(n-2, \frac{\alpha}{2})}S_e\sqrt{\frac{1}{n} + \frac{\bar{x}^2}{S_{xx}}} 
+\quad \Rightarrow \quad 
+$$
+
+```{r}
+61.85 - 446.17 * 15.53 /64.51 + c(
+  "Lower bound"=1,
+  "Point est" = 0,
+  "Upper bound"= -1)*qt(0.005, df=18)*sqrt(36.58*(1/20 + 15.53^2/64.51)) 
+```
+
+## Ex 2.13
+
+presuming $y_i = \beta_0 + \beta_1 x_i + \epsilon_i$, $S^2_e = \frac{1}{n-2}\sum^n_i e_i^2$
+
+```{r}
+y = c(2,2.5, 3.2, 4.1, 5)
+yhat = c(1.5, 2, 3, 5, 4.5)
+
+Syy = sum((y - mean(y))^2)
+SSE = sum((yhat - y)^2)/(length(y) - 2)
+SSR = Syy - SSE
+SSE
+SSR
+Syy
+```
+
+
+

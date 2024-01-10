@@ -1,0 +1,156 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+''[---
+title: "Regression Chapter 4 HW"
+author: "Pooria Assarehha"
+date: "2023-12-22"
+output: pdf_document
+---
+
+## Ex 4.1
+
+$$\hat{\beta} = (X'X)^{-1} X'Y \quad , \quad X'Y = 
+\left[\begin{matrix} 1 & \dots & 1 \\
+x_1 & \dots & x_n
+\end{matrix} \right]
+\left[\begin{matrix}
+y_1 \\ \vdots \\ y_n
+\end{matrix} \right] = 
+\left[\begin{matrix}
+\sum_i^n y_i \\ \sum_i^n x_i y_i
+\end{matrix} \right]$$
+
+```{r}
+xxtinv = matrix(c(28400, -500, -500, 10), nrow=2) / 34000
+xty = matrix(c(1100, 61800), nrow=2)
+xxtinv %*% xty
+```
+
+$$\hat{\beta} = \left[\begin{matrix}
+\hat{\beta}_0 \\ \hat{\beta}_1
+\end{matrix} \right] = \frac{1}{34000} 
+\left[\begin{matrix}
+28400 & -500 \\ -500 & 10
+\end{matrix} \right] \left[\begin{matrix}
+1100 \\ 61800
+\end{matrix} \right] =  \left[\begin{matrix}
+10 \\ 2
+\end{matrix} \right]$$
+
+## Ex 4.4
+if $Y$ is a random vector,  define $Cov(Y)$ as variance-covariance matrix
+
+$$Cov(\hat{Y}) = Cov(HY) = HCov(Y)H' = H_{(n\times n)} \sigma^2 I_n H' = \sigma^2 HH'$$
+$H$ idempotent and symmetric
+$$HH' = \left(X(X'X)^{-1}X'\right)\left(X(X'X)^{-1}X'\right)' = \left(X(X'X)^{-1}X'\right)\left(X \left((X'X)^{-1}\right)' X'\right)  $$
+
+$$ \left(X  \left( (X'X)^{-1}X'X \right)  \left((X'X)^{-1}\right)' X'\right) =   \left(X\left((X'X)'\right)^{-1} X'\right)  = X (X'X)^{-1} X = H'\Rightarrow Cov(\hat{Y}) = \sigma^2 H  $$
+$$ \sum_i^n Var(\hat{y}_i) = \sum_i^n \sigma^2 h_{ii} = \sigma^2 tr(H) = \sigma^2tr(X(X'X)^{-1}X') = \sigma^2tr(X'X(X'X)^{-1}) = \sigma^2 tr(I_p) = p\sigma^2$$
+
+## Ex 4.10
+
+```{r}
+y = matrix(c(4.7, 4.3, 3.5, 4.0, 3.2, 4.7, 4.3, 4.7, 5.2, 4.2, 3.5, 3.2, 2.6, 
+             2.0, 4.0, 3.9, 3.0, 4.5, 2.4), ncol = 1)
+x = matrix(c(
+  78.0, 67.6, 98.0, 65.6, 65.0, 65.5, 85.5, 76.3, 79.0, 88.2,
+  70.5, 75.0, 68.0, 65.0, 70.4, 63.0, 91.2, 67.5, 62.0,
+  175, 173, 171, 166, 166, 176, 185, 171, 185, 182, 180, 163, 
+  180, 180, 180, 168, 168, 178, 173,
+  1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 
+  24, 36, 28, 25, 26, 22, 27, 27, 36, 24, 26, 29, 33, 31,
+  30, 22, 27, 46, 36), ncol = 4 , byrow =  FALSE)
+n = length(y)
+p = dim(x)[2]
+model = lm(y~x)
+summary(model)
+```
+
+```{r}
+xnew = matrix(c(rep(1,19), x), ncol=5)
+B = coef(model)
+e = model$residuals
+mse = sum(e^2) / (n-p)
+for (i in 1:5){
+  T = B[i] / sqrt(solve(t(xnew) %*% xnew )[i,i]*mse)
+  print(2*pt( abs(T) , df = n-p, lower.tail = FALSE) ) 
+}
+```
+
+```{r}
+R2 = 1 - sum(e^2)/sum( (y - mean(y))^2 )
+R2
+
+R2adj = 1 - ((n-1)/(n-p))*(sum(e^2)/sum( (y - mean(y))^2 ))
+R2adj
+```
+Small values of $R^2_{adj}$ means model is not a good fit. even $\bar{y}$ is as good at predicting as this model.
+
+## Ex 4.15
+### (a)
+$$\hat{\beta} = (X'X)^{-1} X'Y = 
+\left[\begin{matrix}
+0.1132151 & -0.0044486 & -0.0000836 \\
+-0.0044486 & 0.0027437 & -0.0000478 \\ 
+-0.0000836 & -0.0000478 & 0.0000012
+\end{matrix} \right]
+\left[\begin{matrix}
+559.60 \\ 7375.44 \\ 337072
+\end{matrix} \right] = 
+\left[\begin{matrix}
+2.365 \\ 1.634 \\ 0.005
+\end{matrix} \right] $$
+
+```{r}
+xxtinv = matrix(c(0.1132151 , -0.0044486 , -0.0000836 ,
+-0.0044486 , 0.0027437 , -0.0000478 , 
+-0.0000836 , -0.0000478 , 0.0000012) , nrow = 3)
+
+xty = matrix(c(559.60, 7375.44, 337072), nrow = 3)
+B = xxtinv %*% xty
+B
+```
+
+### (b)
+
+$$ T = \frac{\hat{\beta_2} - \beta_2}{\sqrt{\hat{Var(\hat{\beta}_2)}}} \quad\Rightarrow\quad \frac{1.634}{\sqrt{\frac{SSE}{n-p} \times 0.0027437}}$$
+
+$$SSE = \bf e'\bf e = (\bf y - \bf{Hy} )'(y - Hy) = (y' - y'H')(y - Hy) = y'y - y'Hy$$
+
+$$y'Hy = y' X(X'X)^{-1}X' y = (X'y)' (X'X)^{-1} X'y  $$
+
+```{r}
+yty = 18310.6290
+sse = yty - t(xty) %*% xxtinv %*% xty
+sse
+mse = sse / (25 - 3)
+mse
+```
+
+$$SSE = y'y - y'Hy = 3193.025 \Rightarrow MSE = \frac{3193.025}{25-3} = 145.1375 \quad  \textbf{(d)}$$
+
+```{r}
+t = B[2] / sqrt(mse*xxtinv[2,2])
+t
+```
+$$T = \frac{1.634}{\sqrt{145.1375 \times 0.0027437}} = 2.590187$$
+
+### XXXXXX (INCONCLUSIVE) (c)
+
+```{r}
+R2adj = 1 - ((24-1)/(25-3))*(sse/(yty - 0 ) )
+R2adj
+```
+
+$$\bar{y} = \beta_0 + \left[ \begin{matrix} \bar{x}_1 & \bar{x}_2   \end{matrix} \right]\left[ \begin{matrix} \beta_1 \\ \beta_2  \end{matrix} \right]$$
+$$R^2_{adj} = 1 - \frac{n-1}{n-p} \frac{SSE}{Syy} = 1 - \frac{25-1}{25-3} \frac{SSE}{y'y - n\bar{y}^2} $$
+
+We need $\bar{y}$ or at least $\bar{X}$ to calculate Syy. MORE INFO NEEDED. PROBLEM IS INCONCLUSIVE. 
+
+### (d)
+
+$$MSE = \frac{SSE}{n-p} = \frac{y'y - y'Hy}{25-3} = 145.1375 $$
+

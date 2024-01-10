@@ -1,0 +1,12 @@
+---
+title: "Regression HW Chapter 5"
+author: "Pooria Assarehha"
+date: "2024-01-10"
+output: pdf_document
+---
+
+## Ex 5.14
+```{r}
+trees
+step(lm(Volume~1, data = trees),Volume~Girth+Height,  data=trees, direction = "forward", test="F")
+```

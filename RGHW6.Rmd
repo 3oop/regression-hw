@@ -1,0 +1,267 @@
+---
+title: "Regression Chapter 4 HW6"
+author: "Pooria Assarehha"
+date: "2024-01-06"
+output: pdf_document
+---
+
+## Ex 4.9
+
+### a
+
+$$H_0 : \beta_1 = \beta_2 = \beta_4 \quad \Rightarrow \quad R \bf{\beta} = \left[ \begin{matrix}
+0 & 1 & -1 & 0 & 0 & 0\\
+0 & 0 & 1 & 0 & -1 & 0\\ 
+\end{matrix} \right]\left[ \begin{matrix} \beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3 \\ \beta_4 \\ \beta_5 \end{matrix} \right] = \left[ \begin{matrix} 0 \\ 0 \\ 0\\ 0 \\ 0 \\ 0 \\ \end{matrix} \right]$$
+
+### b
+
+$$H_0 : \beta_1 = \beta_2 \ , \  \beta_3 = \beta_4 \ , \ \beta_0 = 0 \quad \Rightarrow \quad R \bf{\beta} = \left[ \begin{matrix}
+1 & 0 & 0 & 0 & 0 & 0\\ 
+0 & 1 & -1 & 0 & 0 & 0\\
+0 & 0 & 0 & 1 & -1 & 0\\ 
+\end{matrix} \right]\left[ \begin{matrix} \beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3 \\ \beta_4 \\ \beta_5 \end{matrix} \right] = \left[ \begin{matrix} 0 \\ 0 \\ 0\\ 0 \\ 0 \\ 0 \\ \end{matrix} \right]$$
+
+### c
+
+$$H_0 : \beta_1 - 2\beta_5 = 3\beta_4 \ , \  \beta_1 + 2\beta_3 = 0 \quad \Rightarrow \quad R \bf{\beta} = \left[ \begin{matrix}
+0 & 1 & 0 & 0 & -3 & -2\\ 
+0 & 1 & 0 & 2 & 0 & 0\\
+\end{matrix} \right]\left[ \begin{matrix} \beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3 \\ \beta_4 \\ \beta_5 \end{matrix} \right] = \left[ \begin{matrix} 0 \\ 0 \\ 0\\ 0 \\ 0 \\ 0 \\ \end{matrix} \right]$$
+
+## Ex 4.14
+
+```{r}
+rm(list = ls())
+Age = c(19, 14, 11, 13, 13, 12, 18, 14, 20, 17 , 13, 21, 11, 19, 17, 15, 16, 16, 14, 22)
+HD = c(51.5, 41.3, 36.7, 32.2, 39, 29.8, 51.2, 46.8, 61.8, 55.8, 37.3, 54.2, 32.5, 56.3, 52.8, 47, 53, 50.3, 50.5, 57.7)
+N = c(500, 900, 650, 480, 520, 610, 700, 760, 930, 690, 800, 650, 530, 680, 620, 900, 620, 730, 680, 480)
+MDBH = c(7, 5, 6.2, 5.2, 6.2, 5.2, 6.2, 6.4, 6.4, 6.4, 5.4, 6.4, 5.4, 6.7, 6.7, 5.9, 6.9, 6.9, 6.9, 7.9)
+
+x1 = HD
+x2 = Age*N
+x3 = HD/N
+y = MDBH
+
+n = length(y)
+p = 4
+
+fit = lm(y ~ x1 + x2 + x3)
+summary(fit)
+```
+
+### b
+
+```{r}
+Syy = sum((y-mean(y))^2)
+SSE = sum(fit$residuals^2)
+R2 = 1 - SSE/Syy
+adj = (n-1)/(n-p)
+R2adj = 1 - adj*SSE/Syy
+paste("Multiple R-squared:  " , R2)
+paste("Adjusted R-squared:  " , R2adj)
+```
+
+### g
+
+$$H_0: \beta_1 = \beta_2 = \beta_3 = 0$$
+
+```{r}
+anova(fit)
+
+MSE = SSE/(n-p)
+SSR = Syy - SSE
+Fstat = SSR/(p-1)/MSE
+pval = 1-pf(Fstat, df1 = p-1, df2 = n-p)
+
+SSR
+sum(anova(fit)[1:3,2])
+paste("Fstatistic:  ", Fstat)
+paste("p-value:  ", pval)
+paste(pval, "   <   ", 0.05)
+```
+
+Fstat and pvalue of Meaningfulness was also given in the summery.
+
+### d
+
+$$\hat{\sigma}^2 = MSE = \frac{SSE}{n-p} \quad , \quad Cov(\hat{\beta}) = \sigma^2 (X^tX)^{-1} $$
+
+```{r}
+X = cbind(rep(1,n), x1, x2, x3)
+v = MSE*solve(t(X) %*% X)
+for (i in 0:(p-1)){
+  print(paste("variance of Beta", i, ":   ", v[i+1,i+1] ))
+}
+```
+
+### h 
+
+We can refer to the summary of fit or calculate like this:
+
+```{r}
+B = fit$coefficients
+Tstat = B/sqrt(diag(v))
+pval = 2* (1 - pt(Tstat, df = n-p))
+pval
+```
+
+STRANGE, PVAL FOR $\beta_0 = 0$ is bigger than 0.05 then we cannot reject it.
+BUT SUMMARY OF FIT TELLS OTHERWISE?
+OTHER VALUES ARE IDENTICAL.
+
+### V
+
+```{r}
+yh = fit$fitted.values
+# or we calculate
+
+H =  X %*% (v/MSE) %*% t(X)
+yhat = H %*% y
+
+res = cbind(yh, yhat)
+colnames(res) <- c("from fit" , "calculated")
+res
+```
+
+### z
+
+$$ H_0: R\beta = 0 = \left[ \begin{matrix} 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1  \end{matrix} \right]\left[ \begin{matrix} \beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3 \\  \end{matrix} \right] $$
+
+```{r}
+reducedfit = lm(y~x2)
+anova(reducedfit, fit)
+```
+
+Null Hypo is Rejected, $\beta_1$ and $\beta_3$ are not equal to zero.
+
+
+### H
+
+$$e = (I_n - H)y$$
+```{r}
+e = (diag(n) - H) %*% y
+
+sum(e^2)/(n-p)
+```
+
+
+## Ex 4.16
+
+| Source    | Df             | Sum Sq.         | Mean Sq.           | Fstat |
+| --------  | -------------- | --------------  | ------------------ | ---------------- |
+| model     | p-1 = 4             | SSR = 74403.99  | MSR = SSR/p-1 = 18601 | MSR/MSE = 851.72 |
+| error     | n-p = 17 - 5 = 12   | SSE = 262.072   | MSE = SSE/n-p = 21.84 | --- |
+| total     | n - 1               | SST = 74666.06  |         | --- |
+
+$$MSE = S_e^2 = 21.84$$
+
+```{r}
+rm(list = ls())
+paste("R2 adjusted:   ", 1 - ((16)/(12) )* (262.072 / 74666.06))
+paste("R2 :           ", 1 - (262.072 / 74666.06))
+```
+
+## Ex 4.19
+
+-- n = 32
+-- $\bar{y} = \frac{642.9}{32}$
+-- $y'y = 14042.31$
+
+### $\hat{\beta}$ = ?
+
+$$ \hat{\beta} = (X'X)^{-1}X'y $$
+
+```{r}
+Xty = matrix(c(642.9, 2380.27, 1909.73), ncol=1)
+XtXinv = matrix(c( 5.7680, -1.1111, -0.5409, -1.1111 , 0.2291, 0.0892, -0.5409, 0.0892, 0.0684), ncol=3)
+
+Bhat = XtXinv %*% Xty
+Bhat
+```
+
+### Syy, SSR, SSE = ? anova? 
+
+ANSWER TO EX 4.20
+$$Syy = \sum^n_i y_i^2 - n\bar{y}^2 =  y'y - n \bar{y}^2 \quad , \quad SSR = Syy - SSE $$
+
+ANSWER TO EX 4.20
+
+$$SSE = (y-Hy)'(y-Hy) = (y' - y'H')(y-Hy) = y'y - y'Hy - y'H'y + y'H'Hy = y'y - y'Hy$$
+
+$$y'Hy = y'X(X'X)^{-1}X'y = (X'y)'(X'X)^{-1}X'y$$
+
+```{r}
+Syy = 14042.31 - 642.9^2/32
+
+SSE = 14042.31 - t(Xty) %*% XtXinv %*% Xty
+
+SSR = Syy - SSE
+
+print(paste("Syy:   ", Syy))
+print(paste("SSE:   ", SSE))
+print(paste("SSR:   ", SSR))
+
+MSR = SSR /(3-1)
+MSE = SSE/(32-3)
+Fs = MSR / MSE
+pvalue = 1- pf(Fs, df1 = 3-1, df2= 32-3)
+
+paste(pvalue , "  <  ", 0.05 , "Model is Meaningful")
+```
+
+| Source    | Df  | Sum Sq.     | Mean Sq.    | Fstat            |
+| -------   | --- | ---------   | ----------- | ---------------- |
+| model     | 3   | SSR = 756.8947 | MSR = 378.4473 | MSR/MSE = 29.73019 |
+| error     | 29  | SSE = 369.15   | MSE = 12.7294 |  |
+| total     | 31  | SST = 1126.047 |  |  |
+
+
+### $R^2$ = ? 
+
+```{r}
+R2 = 1 - SSE/Syy
+adj = (32-1)/(32-3)
+R2adj = 1 - adj*SSE/Syy
+paste("Multiple R-squared:  " , R2)
+paste("Adjusted R-squared:  " , R2adj)
+```
+
+not very good but why the model is so meaningful?
+
+### $\hat{Cov}(\hat{\beta})$ = ?
+
+$$\hat{Cov}(\hat{\beta}) = MSE (X'X)^{-1}$$
+
+
+```{r}
+c(MSE) * XtXinv
+```
+
+
+### h
+
+```{r}
+Xt = matrix(c(1,3.90, 2.62), ncol=3)
+
+yt = Xt %*% Bhat
+htt = Xt %*% XtXinv %*% t(Xt) 
+varhatyt = MSE* (1 + htt)
+varhatyt
+```
+
+
+```{r}
+bounds <- c(-1, 0, 1)*sqrt(as.vector(varhatyt))*qt(0.975, df= 32-3) + as.vector(yt)
+
+names(bounds) <- c("Lower", "Point Est." , "Upper")
+bounds
+```
+## Ex 4.20
+
+shown above for Syy and SSE
+
+$$SSE = y'y - y'Hy = y'(I - H)y$$
+
+$$ R^2 = 1- \frac{SSE}{Syy} = 1 - \frac{y'(I - H)y}{y'y - n\bar{y}^2}  $$
+

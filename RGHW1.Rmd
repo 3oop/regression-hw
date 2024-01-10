@@ -1,0 +1,363 @@
+---
+title: "Regression I HW1"
+author: "Pooria Assarehha"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+# from the ebook
+## Ex 1.1
+
+$$
+Cov(\bar{y}, \hat{\beta}_1) = Cov(\frac{1}{n}\sum (\beta_0 + \beta_1 x_i + \epsilon_i) ,  \sum_j^n k_j y_j) = \frac{1}{n}\sum_i^n \sum_j^n  k_j Cov(\epsilon_i ,   y_j) 
+$$
+
+$$
+= \frac{1}{n}\sum_i^n\sum_j^n  k_j Cov(\epsilon_i , \beta_0 + \beta_1 x_j + \epsilon_j) = \frac{1}{n}\sum_i^n\sum_j^n  k_j Cov(\epsilon_i ,   \epsilon_j) = \frac{1}{n}\sum_j^n k_j Var(e_j) = \frac{\sigma^2}{n}\sum_i^n k_j = 0
+$$
+
+$$
+Var(\hat{\beta}_0) = Var(\bar{y} -\hat{\beta}_1 \bar{x}) = Var(\bar{y}) + Var(\hat{\beta}_1 \bar{x}) + Cov(\bar{y}, \hat{\beta}_1 \bar{x}) = \frac{\sigma^2}{n} + \bar{x}^2 \frac{\sigma^2}{S_{xx}} + \bar{x}Cov(\bar{y}.\hat{\beta_1}) = \sigma^2\left( \frac{1}{n} + \frac{\bar{x}^2}{S_{xx}} \right)  
+$$
+
+## Ex 1.2
+```{r,echo=FALSE}
+library(MPV)
+```
+
+```{r}
+data(table.b1)
+y = table.b1$y
+x = table.b1$x8
+n= length(y)
+
+plot(y~x)
+```
+
+```{r}
+fit = lm(y~x)
+residuals(fit)
+```
+
+$$
+\hat{\sigma^2} = MSE = \frac{SSE}{n-2}
+$$
+
+```{r}
+sum(residuals(fit)^2)/(n-2)
+```
+
+## Ex 1.3
+```{r}
+df = data.frame(
+  x = c(165 , 197, 180, 155, 212, 175, 190, 210, 200, 149, 158, 169, 170, 172, 159, 168, 
+        174, 183, 215, 195, 180, 143, 240, 235, 192, 187),
+  y = c(130, 133, 150, 128, 151, 146, 150, 140, 148, 125, 133, 135, 150, 135, 128, 132, 
+        149, 158, 150, 163, 156, 124, 170, 165, 160, 159)
+)
+x = df$x
+y = df$y
+n = nrow(df)
+Sxx = var(x)*(n-1)
+Syy = var(y)*(n-1)
+Sxy = sum((x - mean(x))*(y - mean(y)))
+Sxy/sqrt(Syy*Sxx)
+plot(y~x)
+lm(y~x)
+```
+
+## Ex 1.4
+$$
+J = \sum \epsilon_i^2 = (y_1 - \theta)^2 + (y_2 - \theta + \phi)^2 + (y_3 -\theta - 2\phi)^2 
+$$
+
+$$
+\frac{\partial J }{\partial \theta} = 0 \Rightarrow -2(y_1 - \theta) -2(y_2 - \theta + \phi) -2(y_3 -\theta - 2\phi) = 0 \Rightarrow n\bar{y} - n\theta -\phi = 0 
+$$
+$$
+\frac{\partial J }{\partial \phi} = 0 \Rightarrow 2(y_2 - \theta + \phi) -4(y_3 -\theta - 2\phi) = 0 \Rightarrow y_2 -2y_3  +\theta + 5\phi = 0 
+$$
+
+$$
+\hat{\phi} = 3(\bar{y} - \theta) 
+$$
+
+$$
+\hat{\theta} = \frac{y_2 - 2y_3 + 15\bar{y}}{14}
+$$
+
+## Ex 1.5
+
+$$
+\frac{\partial J}{\partial \beta_0} = 0 \Rightarrow -2\sum (1+2x_i)(y_i -\beta_0 - 2\beta_0 x_i) = 0 
+$$
+
+$$
+\sum_i^n (y_i -\beta_0 - 2\beta_0 x_i + 2x_iy_i -2\beta_0x_i - 4\beta_0 x_i^2) = 0 
+$$
+
+$$
+n\bar{y} - n\beta_0 - 4n\beta_0\bar{x} + 2\sum x_i y_i -4\beta_0\sum x_i^2 = 0 
+$$
+
+$$
+\beta_0 \left( n + 4n\bar{x} + 4\sum x_i^2  \right) = n\bar{y} + 2\sum x_iy_i 
+$$
+
+$$
+\hat{\beta_0} = \frac{n\bar{y} + 2\sum x_iy_i}{n + 4n\bar{x} + 4\sum x_i^2}
+$$
+
+
+## Ex 1.6
+
+$$
+\sum x_i (y_i - \beta_0 - \beta_1x_i) = 0 \quad \Rightarrow \quad \hat{\beta_1} = \frac{\sum x_iy_i - n\bar{x}\beta_0}{\sum_i^n x_i^2} 
+$$
+
+$$
+\sum_i^n e_i = \sum_i^n ( y_i -\hat{y_i}) = \sum_i^n \left( \beta_0 + \beta_1 x_i + \epsilon_i -\beta_0 - \hat{\beta_1} x_i \right) =  (\beta_1 - \hat{\beta_1} )\sum_i^n x_i + \sum_i^n \epsilon_i  =  (\beta_1 - \hat{\beta_1})n\bar{x} + \sum_i^n \epsilon_i \neq 0
+$$
+
+$$
+\sum_i^n x_ie_i = \sum_i^n x_iy_i - \sum_i^n x_i\hat{y_i} = \sum_i^n x_iy_i - \sum_i^n x_i\beta_0 - \hat{\beta_1}\sum_i^n x_i^2 = \sum_i^n x_iy_i - \sum_i^n x_i\hat{y_i} = \sum_i^n x_iy_i - \sum_i^n x_i\beta_0 - \hat{\beta_1}\sum_i^n x_i^2 
+$$
+
+$$
+\sum_i^n x_iy_i - \sum_i^n x_i\hat{y_i} = \sum_i^n x_iy_i - \sum_i^n x_i\beta_0 - \frac{\sum x_iy_i - n\bar{x}\beta_0}{\sum_i^n x_i^2} \sum_i^n x_i^2 = 0
+$$
+
+$$
+\sum_i^n e_i \hat{y_i} = \beta_0\sum_i^n e_i + \hat{\beta_1}\sum_i^n e_ix_i = \beta_0 (\beta_1 - \hat{\beta_1})n\bar{x} + \beta_0\sum_i^n \epsilon_i \neq 0
+$$
+
+## Ex 1.7
+
+$$
+P(y_i > \beta_0 + \beta_1 x_i) = P(y_i -\beta_0 - \beta_1 x_i > 0) = P(\epsilon_i > 0) = \frac{1}{2}
+$$
+
+## Ex 1.8
+
+$$
+E\left[ \frac{\sum_i^n (x_i - \bar{x})y_i}{\sum_i^n (x_i - \bar{x})^2} \right] = \frac{E[\sum_i^n (x_i - \bar{x})y_i]}{\sum_i^n (x_i - \bar{x})^2} = \frac{\sum_i^n E[(x_i - \bar{x})y_i]}{\sum_i^n (x_i - \bar{x})^2} =  \frac{\sum_i^n (x_i - \bar{x})E[y_i]}{\sum_i^n (x_i - \bar{x})^2} = \frac{\sum_i^n (x_i - \bar{x})E[\beta_1 x_i + \epsilon_i]}{\sum_i^n (x_i - \bar{x})^2} 
+$$
+
+$$
+= \frac{\beta_1\sum_i^n (x_i - \bar{x})x_i}{\sum_i^n (x_i - \bar{x})^2} = \beta_1 \sum_i^n k_i x_i = \beta_1
+$$
+
+$$
+Var \left[ \frac{\sum_i^n (x_i - \bar{x})y_i}{\sum_i^n (x_i - \bar{x})^2}  \right] = Var \left[ \sum_i^n k_i y_i \right]= \sum_i^n \sum_j^n k_i k_j Cov\left[y_i , y_j  \right] = \sum_i^n \sum_j^n k_i k_j Cov\left[\beta_1x_i + e_i , \ \beta_1 x_j + e_j  \right] 
+$$
+
+$$
+= \sum_i^n \sum_j^n k_i k_j Cov\left[ e_i ,  e_j  \right] = \sum_i^n k_i^2 \sigma^2 =  \sigma^2 \sum_i^n k_i^2 = \sigma^2 \sum_i^n \frac{(x_i - \bar{x})}{\sum_i^n (x_i - \bar{x})^2} \frac{(x_i - \bar{x})}{\sum_i^n (x_i - \bar{x})^2} = \frac{\sigma^2}{S_{xx}} 
+$$
+
+## Ex 1.9
+$$
+\sum_i^n Var (\hat{y_i}) = \sum_i^n Var (\hat{\beta_0} + \hat{\beta_1}x_i) = \sum_i^n Var (\bar{y} - \hat{\beta_1}\bar{x} + \hat{\beta_1}x_i) = \sum_i^n Var (\bar{y} + \hat{\beta_1}( x_i - \bar{x})) 
+$$
+
+$$
+= \sum_i^n \left( Var(\bar{y}) + (x_i - \bar{x})^2 Var(\hat{\beta_1}) + 2(x_i - \bar{x})Cov(\bar{y}, \hat{\beta}_1)   \right)
+$$
+from Ex 1.1 we know $Cov(\bar{y}, \hat{\beta_1}) = 0$
+
+$$
+\sum_i^n \left( Var(\bar{y}) + (x_i - \bar{x})^2 \frac{\sigma^2}{S_{xx}} \right) = \sum_i^n \sigma^2 \frac{1}{n} +  \sigma^2\sum_i^n\frac{(x_i - \bar{x})^2}{S_{xx}} = 2\sigma^2
+$$
+
+## Ex 1.10
+$$
+Cov(\hat{y_i}, \bar{y}) = Cov(\bar{y} + \hat{\beta_1}( x_i - \bar{x}) , \bar{y}) = Var(\bar{y}) + 2(x_i - \bar{x})Cov(\bar{y}, \hat{\beta}_1) + Cov(\epsilon_i, \bar{y}) = \frac{2\sigma^2}{n} 
+$$
+
+## Ex 1.11
+
+$$
+y_i = \alpha_0 + \alpha_1 x_i + \epsilon_i \quad \Rightarrow \quad \hat{\alpha}_1 = \sum_i^n k_i y_i \quad , \quad k_i = \frac{x_i - \bar{x}}{S_{xx}} 
+$$
+
+$$
+x_i = \beta_0 + \beta_1 z_i + e_i \quad \Rightarrow \quad \hat{\beta}_1 = \sum_i^n g_i x_i \quad , \quad g_i = \frac{z_i - \bar{z}}{S_{xx}}
+$$
+
+$$
+y_i = \theta_0 + \theta_1 z_i + \epsilon_i \quad \Rightarrow \quad \hat{\theta}_1 = \sum_i^n g_i y_i \quad , \quad y_i = \alpha_0 + \alpha_1x_i + \epsilon_i
+$$
+
+$$
+\hat{\theta}_1 = \sum_i^n g_i\left( \hat{\alpha}_0 + \hat{\alpha}_1x_i\right) = \hat{\alpha}_0\sum_i^n g_i + \hat{\alpha}_1\sum_i^n g_ix_i  = \hat{\alpha}_1\hat{\beta}_1 
+$$
+
+$$
+\hat{\theta}_0 = \bar{y} - \hat{\theta}_1 \bar{z} = \bar{y} - \hat{\alpha}_1\hat{\beta}_1 \bar{z} 
+$$
+
+## Ex 1.12
+
+$$
+\frac{X^2 + 4Y^2}{4YX} =1  \quad \Rightarrow \quad X^2 - 4XY + (2Y)^2 = 0 \quad \Rightarrow \quad (X - 2Y)^2 = 0 \quad \Rightarrow \quad Y = \frac{X}{2} 
+$$
+
+$$
+Corr(V,U) = \frac{Cov(V,U)}{\sqrt{Var(V)Var(U)}} = \frac{Cov(5Y+3, 3X+5)}{\sqrt{Var(5Y+3)Var (3X+5)}} = \frac{15Cov(X,Y)}{\sqrt{9\times25Var(Y)Var(X)}} = Corr(X,Y) 
+$$
+
+$$Corr(X,Y) = \frac{Cov(X,Y)}{\sqrt{Var(X)Var(Y)}} = \frac{\tfrac{1}{2}Cov(X,X)}{\tfrac{1}{2}\sqrt{Var(X)Var(X)}} = \frac{Var(X)}{Var(X)} = 1$$
+
+both have linear relation to x, then are linearly correlated and none have negative coefficient. hence their correlation is 1.
+
+## Ex 1.13
+
+$$
+L = (y_1 - 2\beta)^2 + (y_2 - 3\beta)^2 \quad \Rightarrow \quad \frac{\partial L}{\partial \beta} =0 \\
+\Rightarrow \quad 2(-2)(y_1 - 2\beta) +  2(-3)(y_2 - 3\beta) = 0 
+$$
+
+$$
+\Rightarrow \quad 2y_1 -4\beta + 3y_2 -9\beta = 0 \quad \Rightarrow \quad \beta = \frac{2y_1 + 3y_2}{13}
+$$
+
+## Ex 1.14
+
+$$
+L = \sum_i^n \left( y_i - i\beta \right)^2 \quad , \quad \frac{\partial L}{\partial \beta} = 0 \\
+\Rightarrow \quad -2\sum_i^n i\left( y_i - i\beta \right) = 0 \\
+\sum_i^n iy_i - \beta\sum_i^n i^2 = 0 \quad \Rightarrow \quad \beta = \frac{\sum_i^n iy_i}{\sum_i^n i^2}
+$$
+
+## Ex 1.15
+
+$$
+\sum_i^n x_i^*y_i^* = \sum_i^n \frac{x_i - \bar{x}}{\sqrt{S_{xx}}} \frac{y_i - \bar{y}}{\sqrt{S_{yy}}} = \frac{S_{xy}}{\sqrt{S_{xx}S_{yy}}} = \frac{\hat{\beta_1} S_{xx}}{\sqrt{S_{xx}S_{yy}}} \quad \Rightarrow \quad \hat{\beta_1} = \sqrt{\frac{S_{yy}}{S_{xx}}}\sum_i^n x_i^*y_i^*
+$$
+
+## Ex 1.16
+
+This exercise is paradoxical and is ommited in the new edition.
+$$
+\sum_i^n e_i = 2 \quad , \quad \sum_i^n \hat{y_i} = 15 + a + b \quad , \quad \sum_i^n y_ie_i = 50 + a + b
+$$
+
+$$
+e_i + \hat{y_i} = y_i \quad , \quad 2 + b  = \frac{b}{2} \quad \Rightarrow \quad b = -4 \quad \text{BUUTTTT} \quad \hat{y_i} - y_i = e_i =  \hat{y_i} - \frac{y_ie_i}{e_i} \neq e_i
+$$
+
+$$
+e_i + \hat{y_i} = \frac{y_ie_i}{e_i} \quad , \quad a - 1 = \frac{a}{-1} \quad \Rightarrow \quad a = \frac{1}{2}
+$$
+
+## Ex 1.17
+$$
+\frac{1}{n-1}\sum_i^n \left( \hat{y}_i - \bar{\hat{y}}\right)^2 = \frac{1}{n-1}\sum_i^n \left( \hat{y}_i - \frac{1}{n}\sum_j^n (\hat{\beta}_0 + \hat{\beta}_1 x_j) \right)^2 
+$$
+
+$$
+= \frac{1}{n-1}\sum_i^n \left( \hat{y}_i - \frac{1}{n}\sum_j^n (\bar{y} - \hat{\beta}_1\bar{x} + \hat{\beta}_1 x_j) \right)^2 = \frac{1}{n-1}\sum_i^n \left( \hat{y}_i - \frac{1}{n}\sum_j^n \bar{y}  + \hat{\beta}_1 \sum_i^n(x_i -\bar{x}) \right)^2 
+$$
+
+$$
+= \frac{1}{n-1}\sum_i^n \left( \hat{\beta}_0 + \hat{\beta}_1 x_i - \bar{y} \right)^2 = \frac{1}{n-1}\sum_i^n \left(  \bar{y} + \hat{\beta}_1 ( x_i - \bar{x}) - \bar{y} \right)^2 = \frac{\hat{\beta^2_1}}{n-1} S_{xx}  = \frac{1}{n-1} \frac{S^2_{xy}}{S_{xx}} = \frac{r^2S_{yy}}{n-1}
+$$
+
+## Ex 1.18
+
+$$
+\hat{\alpha_0} = b\bar{y} - \hat{\alpha_1} a\bar{x} \quad , \quad \hat{\alpha_1} = \frac{abS_{xy}}{a S_{xx}} = b\hat{\beta_1} \quad \Rightarrow \quad \hat{\alpha_0} = b\bar{y} - ab\hat{\beta_1}\bar{x}
+$$
+
+## Ex 1.19
+
+$$
+E(\left( \hat{\beta^*_1} - \beta_1  \right)^2) = E[\left( \frac{\sum_i^n x_iy_i}{\sum_i^n x_i^2} - \beta_1 \right)^2] = E[\left( \frac{\sum_i^n x_iy_i}{\sum_i^n x_i^2} \right)^2   - 2\beta_1 \frac{\sum_i^n x_iy_i}{\sum_i^n x_i^2} + \beta_1^2] = \beta_1^2 - 2\frac{\beta_1 \sum_i^n x_i E [y_i]}{{\sum_i^n x_i^2}} + E\left( \frac{\sum_i^n x_iy_i}{\sum_i^n x_i^2} \right)^2 
+$$
+
+$$
+= \beta_1^2 - 2\frac{\beta_1 \sum_i^n x_i (\beta_0 + \beta_1x_i)}{{\sum_i^n x_i^2}} + E[\hat{\beta^*_1}^2] = E[\hat{\beta^*_1}^2] + \beta_1^2 - 2\frac{\beta_1\beta_0 n\bar{x}}{{\sum_i^n x_i^2}} - 2\beta_1^2  
+$$
+
+$$
+E\left(\hat{\beta^*_1}^2 \right) - E^2[\hat{\beta^*_1}] = Var(\hat{\beta^*_1}) = \frac{\sigma^2}{\sum_i^n x_i^2} \quad \Rightarrow \quad E^2[\hat{\beta^*_1}] = \left( \beta_1 + \beta_0 \frac{n\bar{x}}{\sum_i^n x_i^2} \right)^2
+$$
+
+$$
+\left( \beta_1 + \beta_0 \frac{n\bar{x}}{\sum_i^n x_i^2} \right)^2 - \beta_1^2 - 2\frac{\beta_1\beta_0 n\bar{x}}{{\sum_i^n x_i^2}} = \beta_0^2 \frac{n^2\bar{x}^2}{\left( \sum_i^n x_i^2 \right)^2}
+$$
+
+## Ex 1.20
+
+$$
+Var(e_i) = Var(y_i - \hat{y_i}) = Var(\beta_0 + \beta_1x_i + \epsilon_i - \hat{\beta_0} - \hat{\beta_1}x_i) = Var(\epsilon_i - \bar{y} + \hat{\beta_1}\bar{x} - \hat{\beta_1}x_i) 
+$$
+
+$$
+= Var(\epsilon_i) + Var(\bar{y}) + (x_i - \bar{x})^2Var(\hat{\beta_1}) + 2Cov(\epsilon_i,\bar{y}) - 2(x_i - \bar{x})Cov(\bar{y},\hat{\beta_1}) - 2(x_i - \bar{x})Cov(\epsilon_i,\hat{\beta_1}) 
+$$
+
+$$
+= \sigma^2 + \frac{\sigma^2}{n} -2(x_i - \bar{x}) \frac{\sigma^2}{n} = \sigma^2\left(1 + \frac{1}{n} - \frac{2(x_i - \bar{x})}{n}\right)
+$$
+
+## Ex 1.21
+```{r}
+x = c(0.1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3)
+y = c(0.45, 0.20, 0.34, 0.58, 0.70, 0.57, 0.55, 0.44)
+
+plot(y~x)
+```
+
+```{r}
+linfit = lm(y~x)
+summary(linfit)
+fitted(linfit)
+```
+
+## Ex 1.22
+```{r}
+x= c(1.9 , 3.1, 3.3, 4.8, 5.3, 6.1, 6.4, 7.6, 9.8, 12.4)
+y= c(2,1,5,5,20,20,23,10,30,25)
+
+linfit = lm(y~x)
+summary(linfit)
+fitted(linfit)
+```
+
+## Ex 1.23
+$$
+\sum^n_1 (y_i - \hat{y_i})(\hat{y_i} - \bar{y}) =  \sum^n_i (y_i - \hat{y_i}) \left( \hat{\beta_0} + \hat{\beta_1}x_i - \bar{y} \right) 
+=  \sum^n_i (y_i - \hat{y_i}) \left( \bar{y} - \hat{\beta_1}\bar{x} + \hat{\beta_1}x_i - \bar{y} \right) 
+$$
+
+$$
+= \hat{\beta_1}\sum^n_i (y_i - \hat{y_i})( x_i - \bar{x}) 
+= \hat{\beta_1}\sum^n_i \left(y_i - \bar{y} - \hat{\beta_1} (x_i-\bar{x})\right)( x_i - \bar{x}) 
+$$
+
+$$
+= \hat{\beta_1}\sum^n_i \left((y_i - \bar{y})( x_i - \bar{x}) - \hat{\beta_1} (x_i-\bar{x})^2\right) =\hat{\beta_1}\sum^n_i (y_i - \bar{y})( x_i - \bar{x}) - \hat{\beta_1}\sum^n_i\hat{\beta_1} (x_i-\bar{x})^2 
+$$
+
+$$
+= \hat{\beta_1} \left( S_{xy} - \hat{\beta_1} S_{xx} \right) =  \hat{\beta_1} \left( S_{xy} - \frac{S_{xy}}{S_{xx}} S_{xx} \right)  = 0
+$$
+
+## Ex 1.24
+$$
+\sum_i^n e_i^2 = \sum_i^n (y_i - \hat{y_i})^2 = 
+\sum_i^n (y_i - \bar{y} + \hat{\beta_1}\bar{x} - \hat{\beta_1}x_i)^2 
+=  \sum_i^n \left( (y_i - \bar{y} )^2 + \hat{\beta_1}^2(x_i - \bar{x} )^2 - 2\hat{\beta_1}(y_i - \bar{y} )(x_i - \bar{x}) \right) 
+$$
+
+$$
+=  \sum_i^n (y_i - \bar{y} )^2 + \sum_i^n \hat{\beta_1}^2(x_i - \bar{x} )^2 - \sum_i^n2\hat{\beta_1}(y_i - \bar{y} )(x_i - \bar{x}) = S_{yy} +  \hat{\beta_1}^2 S_{xx} - 2\hat{\beta_1}S_{xy} = S_{yy} + \frac{S^2_{xy}}{S_{xx}} - 2\frac{S^2_{xy}}{S_{xx}} = S_{yy} -  \frac{S^2_{xy}S_{yy}}{S_{xx}S_{yy}}
+$$
+
+$$
+= S_{yy}\left( 1 - r^2 \right)
+$$
