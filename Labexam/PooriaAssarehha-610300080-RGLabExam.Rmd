@@ -1,0 +1,108 @@
+---
+title: "Regression Lab Exam"
+author: "Pooria Assarehha"
+date: "2024-01-10"
+output: pdf_document
+---
+# Pooria Assarehha
+
+```{r}
+#setwd(choose.dir())
+load("labexam_reg_1402.rdata")
+head(data)
+attach(data)
+```
+
+## Question 1. 
+
+test this Hypothesis
+
+$$ H0 : \beta_0 = 0 \ , \ \beta_1 = 0.5\beta_3 \ , \ \beta_4 = \beta_2 + 1 $$
+
+$$y = 0.5\beta_3x_11 + \beta_2x_2 + \beta_3x_3 + \beta_2x_4 + x_4 \quad \Rightarrow \quad y-x_4 = \beta_3(\frac{x_1}{2} + x_3) + \beta_2(x_2 + x_4)$$ 
+
+```{r}
+fit1 = lm(y~x1+x2+x3+x4, data = data)
+
+#ynew = y - x4 
+#x1new = x1/2 + x3
+#x2new = x2 + x4
+
+anova(lm(y~1+I(x2+x4) + I(x1/2+x3) + I(x4)), fit1 )
+pval = anova(lm(y~1+I(x2+x4) + I(x1/2+x3) + I(x4)), fit1 )[2,4]
+pval < 0.05 ## IF FALSE, the H0 can not be rejected. 
+```
+
+$$
+\frac{MSE_1}{MSE_2} \sim F(n-5, n-2) \quad \Rightarrow \quad P(|F_0|<F_{df}) < F_{\tfrac{\alpha}{2}, df} 
+$$
+
+```{r}
+n = length(y)
+df1 = n-5
+df2 = n-2
+mse1 = sum(residuals(lm(y~., data = data))^2)/df1
+mse2 = sum(residuals(lm(I(y-x4)~1+I(x2+x4) + I(x1/2+x3), data = data))^2)/df2
+pf(mse1/mse2, df1 = df1, df2=df2) 
+```
+## Question 2. 
+conduct a model with interaction effects of x2 and x4 and obtian the prediction interval for x0 = c(35,50,4,7)
+
+
+
+
+## Question 3. 
+test the homoscedastisity both with plot and hypothesis testing
+
+```{r}
+library(lmtest)
+res = fit1$residuals
+plot(res, xlab="Index", ylab="Residuals")
+gqtest(y~x1+x2+x3+x4, fraction=0.3)
+```
+
+Visual evidence suggests Hetrosked because when we segment data in 2 parts one has more diversity. test result means we do not reject null Hyp
+
+## Question 4. 
+plot the normal Q-Q plot and suggest a distribution shape instead of normal for errors
+
+```{r, fig.height=7, fig.width=5}
+par(mfrow=c(2,1))
+qqnorm(res)
+qqline(res, col="red")
+hist(res)
+```
+
+ Residuals are skewed to the right hence not normal
+
+
+## Question 5. 
+obtain the VIFs and tell about multicollinearity 
+
+```{r}
+VIFx1 = 1/(1 - summary(lm(x1~x2+x3+x4))$r.squared)
+VIFx2 = 1/(1 - summary(lm(x2~x1+x3+x4))$r.squared)
+VIFx3 = 1/(1 - summary(lm(x3~x2+x1+x4))$r.squared)
+VIFx4 = 1/(1 - summary(lm(x4~x2+x3+x1))$r.squared)
+
+library(car)
+rbind(vif(fit1), c(VIFx1, VIFx2, VIFx3, VIFx4))
+
+X = cbind(1,x1,x2,x3,x4)
+sum(residuals(fit1)^2/(nrow(X)-ncol(X)))*solve(t(X)%*% X)
+```
+all good exepct $Var(\beta_0)$? 
+
+VIF > 10 => Multicolin  WE HAVE MULTCOLIN
+
+## Question 6. 
+Perform the Stepwise variable selection using F test and describe the results
+
+```{r}
+step(lm(y~1),y~x1+x2+x3+x4,direction = "both", test="F")
+```
+
+As a Result, We omit x1 from the model
+
+
+
