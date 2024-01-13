@@ -212,7 +212,7 @@ paste(pvalue , "  <  ", 0.05 , "Model is Meaningful")
 
 | Source    | Df  | Sum Sq.     | Mean Sq.    | Fstat            |
 | -------   | --- | ---------   | ----------- | ---------------- |
-| model     | 3   | SSR = 756.8947 | MSR = 378.4473 | MSR/MSE = 29.73019 |
+| model     | 2   | SSR = 756.8947 | MSR = 378.4473 | MSR/MSE = 29.73019 |
 | error     | 29  | SSE = 369.15   | MSE = 12.7294 |  |
 | total     | 31  | SST = 1126.047 |  |  |
 

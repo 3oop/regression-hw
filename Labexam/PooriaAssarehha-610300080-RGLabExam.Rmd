@@ -28,7 +28,7 @@ fit1 = lm(y~x1+x2+x3+x4, data = data)
 #x1new = x1/2 + x3
 #x2new = x2 + x4
 
-anova(lm(y~1+I(x2+x4) + I(x1/2+x3) + I(x4)), fit1 )
+anova(lm(y~1+I(x2+x4) + I(x1/2+x3) + I(x4)), fit1 )  #### THIS CANNOT BE H_0'S MODEL
 pval = anova(lm(y~1+I(x2+x4) + I(x1/2+x3) + I(x4)), fit1 )[2,4]
 pval < 0.05 ## IF FALSE, the H0 can not be rejected. 
 ```
