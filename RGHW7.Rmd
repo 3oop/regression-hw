@@ -51,7 +51,7 @@ $x_3$ is not accepted into the model. final model is:
 
 $$y = \beta_0 + \beta_1x_1 + \beta_2x_2 $$
 
-## Ex 5.11
+## Ex 5.11  (Insufficient info?)
 
 --- $H_0: \beta_1 = \beta_2 = 0$
 
@@ -70,9 +70,11 @@ $$R^2_{adj} = 1 - \frac{n-1}{n-p}\frac{SSE}{SST} = 1-\frac{21}{18}\frac{442.292}
 
 ## Ex 5.12
 
-$$$$
-
 $$r^2_{y,x_1|x_2} = \frac{SSR(x_1,x_2) - SSR(x_2)}{SSE(x_2)}$$
+
+$$SSR(x_1,x_2) = Syy - SSE(x_1, x_2) = Syy - \sum_i^n (y-\hat{y}(x_1,x_2))^2\\
+SSE(x_1) = $$
+
 $$r^2_{y,x_2|x_1}$$
 
 $$r^2_{y,x_3|x_1,x_2}$$
