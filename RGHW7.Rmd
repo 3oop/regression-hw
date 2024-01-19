@@ -5,6 +5,79 @@ date: "2024-01-10"
 output: pdf_document
 ---
 
+## Ex 5.7
+
+Step 1: add the most correlated to the model.
+
+$$r^2_{y,x_1} = \frac{SSR}{SST}  = \frac{231.125}{419.875} \quad , \quad r^2_{y,x_2} = \frac{SSR}{SST}  = \frac{171.125}{419.875} \quad \Rightarrow 
+\quad r^2_{y,x_1} >r^2_{y,x_2}$$
+
+We add $x_1$ to the model. $\Rightarrow y = \beta_0 + \beta_1 x_1$ 
+
+Step 2: only one variable is left so we do the test to see if we should add it or not.
+
+$$
+\begin{cases}
+H_0: \beta_2 = 0 \\
+y = \beta_0 + \beta_1x_1 + \beta_2x_2
+\end{cases} \Rightarrow F_0 = \frac{SSR(x_1,x_2|x_1)}{\frac{SSE(full)}{n-p}} = \frac{402.250 - 231.125}{17.625 / 5} = 48.55
+$$
+
+p-value of the statistic is $9\times 10^{-4} < 0.05$ then we Reject $H_0$ and add $x_2$ to the model:
+$$ y = \beta_0 + \beta_1x_1 + \beta_2x_2 $$
+$$r^2_{y,x_1,x_2} = \frac{SSR}{SST} = \frac{402.250}{419.875}$$
+
+$$r^2_{y,x_1|x_2} = \frac{SSR(x_1,x_2) - SSR(x_1)}{SST} = \frac{402.250 - 231.125}{419.875} = \frac{171.125}{419.875}$$
+
+$$r^2_{y,x_2|x_1} = \frac{SSR(x_1,x_2) - SSR(x_2)}{SST} = \frac{402.250 - 171.125}{419.875} = \frac{231.125}{419.875}$$
+
+## Ex 5.8
+
+SST = SSE + SSR(full)
+SSR(full) = SSR($x_1$) + SSR($x_2|x_1$) + SSR($x_3 | x_2 , x_1$)
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+inserted x    |     df    |    SSE        |     $F_0$     |   p-val    |
+------------- | --------- | ------------- | ------------- | ---------- |
+$x_1$         |     1     |   18953.04    |   177.03      | $10^{-11}$ |
+$x_2 | x_1$   |     1     |   7010.03     |   65.48       | $7\times10^{-8}$|
+$x_3|x_1,x_2$ |     1     |   10.93       |   0.102       | $0.7524$   |
+error         |     21    |   2248.23     |               |            |
+total         |     24    |   28222.23    |               |            |
+------------------------------------------------------------------------
+
+$x_3$ is not accepted into the model. final model is:
+
+$$y = \beta_0 + \beta_1x_1 + \beta_2x_2 $$
+
+## Ex 5.11
+
+--- $H_0: \beta_1 = \beta_2 = 0$
+
+$$F_0 = \frac{SSR(x_1, x_2)/2= (SSR(x_1) + SSR(x_2|x_1))/2}{MSE}  = \frac{(981.326 + 190.232)/2}{442.292/18} = 23.84$$
+
+p-val equals $8.7 \times 10^{-6} < 0.05$ for $F_0 \sim F(2,18)$ then we Reject $H_0$.
+$\beta_1$ and $\beta_2$ are not simultaneously zero.
+
+--- $H_0: \beta_1 = \beta_3 = 0$
+
+not enough info to calculate SSR($x_3,x_1$).
+
+--- $R^2$
+
+$$R^2_{adj} = 1 - \frac{n-1}{n-p}\frac{SSE}{SST} = 1-\frac{21}{18}\frac{442.292}{1743.281} = 0.704$$
+
+## Ex 5.12
+
+$$$$
+
+$$r^2_{y,x_1|x_2} = \frac{SSR(x_1,x_2) - SSR(x_2)}{SSE(x_2)}$$
+$$r^2_{y,x_2|x_1}$$
+
+$$r^2_{y,x_3|x_1,x_2}$$
+
+
 ## Ex 5.14
 ```{r}
 trees
