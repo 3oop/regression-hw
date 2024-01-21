@@ -27,9 +27,9 @@ p-value of the statistic is $9\times 10^{-4} < 0.05$ then we Reject $H_0$ and ad
 $$ y = \beta_0 + \beta_1x_1 + \beta_2x_2 $$
 $$r^2_{y,x_1,x_2} = \frac{SSR}{SST} = \frac{402.250}{419.875}$$
 
-$$r^2_{y,x_1|x_2} = \frac{SSR(x_1,x_2) - SSR(x_1)}{SST} = \frac{402.250 - 231.125}{419.875} = \frac{171.125}{419.875}$$
+$$r^2_{y,x_1|x_2} = \frac{SSR(x_1,x_2) - SSR(x_2)}{SSE(x_2)} = \frac{402.250 - 231.125}{248.750} = \frac{171.125}{248.750}$$
 
-$$r^2_{y,x_2|x_1} = \frac{SSR(x_1,x_2) - SSR(x_2)}{SST} = \frac{402.250 - 171.125}{419.875} = \frac{231.125}{419.875}$$
+$$r^2_{y,x_2|x_1} = \frac{SSR(x_1,x_2) - SSR(x_1)}{SSE(x_1)} = \frac{402.250 - 231.125}{188.750} = \frac{171.125}{188.750}$$
 
 ## Ex 5.8
 

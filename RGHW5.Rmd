@@ -1,9 +1,4 @@
 ---
-output:
-  pdf_document: default
-  html_document: default
----
-''[---
 title: "Regression Chapter 4 HW"
 author: "Pooria Assarehha"
 date: "2023-12-22"
